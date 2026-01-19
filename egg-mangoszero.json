@@ -1,0 +1,31 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v1",
+        "update_url": null
+    },
+    "exported_at": "2026-01-19T22:40:00+01:00",
+    "name": "MangosZero Custom",
+    "author": "support@example.com",
+    "description": "A custom Egg for MangosZero (Vanilla WoW) using a pre-built Docker image from GitHub Container Registry.",
+    "features": null,
+    "docker_images": {
+        "ghcr.io/whit3str/mangos0server:latest": "ghcr.io/whit3str/mangos0server:latest"
+    },
+    "file_denylist": [],
+    "startup": "/bin/bash /entrypoint.sh",
+    "config": {
+        "files": "{}",
+        "startup": "{\r\n    \"done\": \"MangosZero initialized\",\r\n    \"userInteraction\": []\r\n}",
+        "logs": "{}",
+        "stop": "^C"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\r\n# Nothing to install, everything is in the image.\r\necho \"This server uses a custom Docker image. No installation required on the panel side.\"",
+            "container": "debian:bullseye-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": []
+}
