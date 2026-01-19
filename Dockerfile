@@ -20,17 +20,16 @@ COPY . .
 RUN mkdir build && cd build && \
     export CC=clang && export CXX=clang++ && \
     cmake .. -DCMAKE_INSTALL_PREFIX=/opt/mangos \
-             -DBUILD_MANGOSD=1 \
-             -DBUILD_REALMD=1 \
-             -DBUILD_TOOLS=0 \
-             -DCMAKE_BUILD_TYPE=Release \
-             -DCMAKE_C_COMPILER=clang \
-             -DCMAKE_CXX_COMPILER=clang++ && \
+    -DBUILD_MANGOSD=1 \
+    -DBUILD_REALMD=1 \
+    -DBUILD_TOOLS=0 \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_CXX_COMPILER=clang++ && \
     make -j$(nproc) && \
     make install
 
-# Copy SQL files to install location
-RUN cp -r sql /opt/mangos/sql
+
 
 # Stage 2: Runtime
 FROM debian:bullseye-slim
