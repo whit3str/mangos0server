@@ -17,13 +17,22 @@ mkdir -p bin
 ln -sf /opt/mangos/bin/mangosd bin/mangosd
 ln -sf /opt/mangos/bin/realmd bin/realmd
 
-# Internal IP/Startup Variable Replacement (Pterodactyl usually handles this, but custom logic here if needed)
-# ...
+# Internal IP/Startup Variable Replacement
+if [ ! -z "${DB_HOST}" ]; then
+    echo "Auto-configuring database connection..."
+    # realmd.conf
+    sed -i "s/^LoginDatabaseInfo *=.*/LoginDatabaseInfo = \"${DB_HOST};${DB_PORT};${DB_USER};${DB_PASSWORD};${DB_REALM}\"/" etc/realmd.conf
+    
+    # mangosd.conf
+    sed -i "s/^LoginDatabaseInfo *=.*/LoginDatabaseInfo = \"${DB_HOST};${DB_PORT};${DB_USER};${DB_PASSWORD};${DB_REALM}\"/" etc/mangosd.conf
+    sed -i "s/^WorldDatabaseInfo *=.*/WorldDatabaseInfo = \"${DB_HOST};${DB_PORT};${DB_USER};${DB_PASSWORD};${DB_MANGOS}\"/" etc/mangosd.conf
+    sed -i "s/^CharacterDatabaseInfo *=.*/CharacterDatabaseInfo = \"${DB_HOST};${DB_PORT};${DB_USER};${DB_PASSWORD};${DB_CHARACTERS}\"/" etc/mangosd.conf
+fi
 
 # Launch
 echo "Starting MangosZero..."
 # Run realmd in background
-/opt/mangos/bin/realmd &
+/opt/mangos/bin/realmd -c etc/realmd.conf &
 REALM_PID=$!
 
 # Run mangosd

@@ -4,7 +4,7 @@
         "version": "PTDL_v1",
         "update_url": null
     },
-    "exported_at": "2026-01-19T22:40:00+01:00",
+    "exported_at": "2026-01-20T13:30:00+01:00",
     "name": "MangosZero Custom",
     "author": "support@example.com",
     "description": "A custom Egg for MangosZero (Vanilla WoW) using a pre-built Docker image from GitHub Container Registry.",
@@ -27,5 +27,69 @@
             "entrypoint": "bash"
         }
     },
-    "variables": []
+    "variables": [
+        {
+            "name": "Database Host",
+            "description": "Hostname or IP of the MySQL database.",
+            "env_variable": "DB_HOST",
+            "default_value": "127.0.0.1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Database Port",
+            "description": "Port of the MySQL database.",
+            "env_variable": "DB_PORT",
+            "default_value": "3306",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric"
+        },
+        {
+            "name": "Database User",
+            "description": "Username for the MySQL database.",
+            "env_variable": "DB_USER",
+            "default_value": "mangos",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Database Password",
+            "description": "Password for the MySQL database.",
+            "env_variable": "DB_PASSWORD",
+            "default_value": "mangos",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Mangos Database",
+            "description": "Name of the World database.",
+            "env_variable": "DB_MANGOS",
+            "default_value": "mangos",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Realm Database",
+            "description": "Name of the Realm database.",
+            "env_variable": "DB_REALM",
+            "default_value": "realmd",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        },
+        {
+            "name": "Characters Database",
+            "description": "Name of the Characters database.",
+            "env_variable": "DB_CHARACTERS",
+            "default_value": "characters",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string"
+        }
+    ]
 }
