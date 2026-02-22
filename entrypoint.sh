@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 cd /home/container
 
 # Ensure config directory exists

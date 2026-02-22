@@ -1,7 +1,10 @@
-#!/bin/bash
-set -e
+﻿#!/bin/bash
+# set -e intentionally removed: MySQL 8.0 compat warnings must not abort init
 
 echo "Initializing Mangos Zero Databases..."
+
+# Fix potential Windows line endings on all SQL files
+find /database -name '*.sql' -exec sed -i 's/\r//' {} + 2>/dev/null || true
 
 # Variables
 DB_CHAR="character0"
@@ -22,9 +25,9 @@ EOSQL
 
 # Import Base Schemas
 echo "Importing Base Schemas..."
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_CHAR < /database/Character/Setup/characterLoadDB.sql
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_WORLD < /database/World/Setup/mangosdLoadDB.sql
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_REALM < /database/Realm/Setup/realmdLoadDB.sql
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_CHAR < /database/Character/Setup/characterLoadDB.sql || { echo "ERROR: characterLoadDB.sql failed"; exit 1; }
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_WORLD < /database/World/Setup/mangosdLoadDB.sql || { echo "ERROR: mangosdLoadDB.sql failed"; exit 1; }
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_REALM < /database/Realm/Setup/realmdLoadDB.sql || { echo "ERROR: realmdLoadDB.sql failed"; exit 1; }
 
 # Helper function to apply updates
 apply_updates() {
@@ -35,7 +38,7 @@ apply_updates() {
         echo "Applying updates for $DB_NAME from $UPDATE_PATH..."
         for f in $(ls $UPDATE_PATH/*.sql 2>/dev/null | sort -V); do
             echo "Processing $f"
-            mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_NAME < "$f"
+            mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_NAME < "$f" || echo "WARNING: $f returned an error (non-fatal)"
         done
     else
         echo "Directory $UPDATE_PATH does not exist, skipping updates for $DB_NAME."
@@ -55,20 +58,19 @@ apply_updates $DB_WORLD "/database/World/Updates/Rel22"
 apply_updates $DB_REALM "/database/Realm/Updates/Rel21"
 apply_updates $DB_REALM "/database/Realm/Updates/Rel22"
 
-# Add Default Realm
-echo "Adding Default Realm..."
-if [ -f "/database/Tools/updateRealm.sql" ]; then
-    mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_REALM < /database/Tools/updateRealm.sql
-fi
-
 # Populate World Database (FullDB)
 echo "Populating World Database..."
-# Usually located in World/Setup/FullDB
 if [ -d "/database/World/Setup/FullDB" ]; then
     for f in $(ls /database/World/Setup/FullDB/*.sql 2>/dev/null | sort -V); do
          echo "Importing $f"
-         mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_WORLD < "$f"
+         mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_WORLD < "$f" || echo "WARNING: $f returned an error (non-fatal)"
     done
+fi
+
+# Insert default realm entry after full init
+echo "Adding Default Realm..."
+if [ -f "/database/Tools/updateRealm.sql" ]; then
+    mysql -u root -p"$MYSQL_ROOT_PASSWORD" $DB_REALM < /database/Tools/updateRealm.sql || echo "WARNING: updateRealm.sql returned an error (non-fatal)"
 fi
 
 echo "Database initialization complete."

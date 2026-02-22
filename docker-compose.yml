@@ -5,7 +5,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: mangos
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ./db:/var/lib/mysql
       - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
       - ./database:/database:ro
     ports:
@@ -13,16 +13,13 @@ services:
     networks:
       - mangos-net
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pmangos" ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 60s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pmangos && mysql -u root -pmangos -e 'SELECT 1 FROM realmd.realmlist LIMIT 1;' 2>/dev/null"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 180s
 
   realmd:
-    build:
-      context: .
-      dockerfile: Dockerfile.realmd
     image: ghcr.io/whit3str/mangos0server-realmd:latest
     container_name: mangos-realmd
     depends_on:
@@ -40,9 +37,6 @@ services:
     restart: unless-stopped
 
   mangosd:
-    build:
-      context: .
-      dockerfile: Dockerfile.mangosd
     image: ghcr.io/whit3str/mangos0server-mangosd:latest
     container_name: mangos-mangosd
     depends_on:

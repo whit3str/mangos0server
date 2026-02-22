@@ -3,6 +3,9 @@
 *.vcproj     eol=crlf
 *.vcxproj*   eol=crlf
 
+*.sh         eol=lf
+Dockerfile*  eol=lf
+
 src/shared/revision_nr.h eol=lf
 src/shared/revision_sql.h eol=lf
 
