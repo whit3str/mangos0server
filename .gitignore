@@ -60,6 +60,7 @@ Thumbs.db
 # Configuration files to be customized
 
 # Build directories
+/wow-data
 /bin/
 _build
 build

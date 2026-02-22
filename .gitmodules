@@ -16,3 +16,6 @@
 [submodule "src/modules/Eluna"]
 	path = src/modules/Eluna
 	url = https://github.com/ElunaLuaEngine/Eluna
+[submodule "database"]
+	path = database
+	url = https://github.com/mangoszero/database

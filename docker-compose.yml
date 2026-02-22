@@ -1,0 +1,62 @@
+services:
+  database:
+    image: ghcr.io/whit3str/mangos0server-database:latest
+    container_name: mangos-database
+    environment:
+      MYSQL_ROOT_PASSWORD: mangos
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - mangos-net
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pmangos" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  realmd:
+    image: ghcr.io/whit3str/mangos0server-realmd:latest
+    container_name: mangos-realmd
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "3724:3724"
+    volumes:
+      - ./config/realmd.conf:/mangos/etc/realmd.conf
+      - ./logs:/mangos/log
+    networks:
+      - mangos-net
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+  mangosd:
+    image: ghcr.io/whit3str/mangos0server-mangosd:latest
+    container_name: mangos-mangosd
+    depends_on:
+      database:
+        condition: service_healthy
+      realmd:
+        condition: service_started
+    ports:
+      - "8085:8085"
+    volumes:
+      - ./config/mangosd.conf:/mangos/etc/mangosd.conf
+      - ./logs:/mangos/log
+      - ./wow-data:/mangos/share/mangos # <- Bind tes fichiers WoW extraits ici
+    networks:
+      - mangos-net
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+
+
+networks:
+  mangos-net:
