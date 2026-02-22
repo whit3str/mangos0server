@@ -7,10 +7,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  OWNER: ${{ github.repository_owner }}
 
 jobs:
-  build:
+  build-mangosd:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -29,17 +29,53 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      - name: Extract metadata for mangosd
+        id: meta-mangosd
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/mangos0server-mangosd
           tags: type=raw,value=latest
 
-      - name: Build and push Docker image
+      - name: Build and push mangosd image
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: Dockerfile.mangosd
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-mangosd.outputs.tags }}
+          labels: ${{ steps.meta-mangosd.outputs.labels }}
+
+  build-realmd:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for realmd
+        id: meta-realmd
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/mangos0server-realmd
+          tags: type=raw,value=latest
+
+      - name: Build and push realmd image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile.realmd
+          push: true
+          tags: ${{ steps.meta-realmd.outputs.tags }}
+          labels: ${{ steps.meta-realmd.outputs.labels }}
