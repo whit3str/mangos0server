@@ -1,13 +1,11 @@
 services:
   database:
-    image: mysql:8.0
+    image: ghcr.io/whit3str/mangos0server-database:latest
     container_name: mangos-database
     environment:
       MYSQL_ROOT_PASSWORD: mangos
     volumes:
       - ./db:/var/lib/mysql
-      - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
-      - ./database:/database:ro
     ports:
       - "3306:3306"
     networks:
@@ -55,10 +53,6 @@ services:
     stdin_open: true
     tty: true
     restart: unless-stopped
-
-volumes:
-  mysql-data:
-
 
 networks:
   mangos-net:

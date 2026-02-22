@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 # set -e intentionally removed: MySQL 8.0 compat warnings must not abort init
 
 echo "Initializing Mangos Zero Databases..."

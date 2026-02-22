@@ -79,3 +79,38 @@ jobs:
           push: true
           tags: ${{ steps.meta-realmd.outputs.tags }}
           labels: ${{ steps.meta-realmd.outputs.labels }}
+
+  build-database:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for database
+        id: meta-database
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.OWNER }}/mangos0server-database
+          tags: type=raw,value=latest
+
+      - name: Build and push database image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile.mysql
+          push: true
+          tags: ${{ steps.meta-database.outputs.tags }}
+          labels: ${{ steps.meta-database.outputs.labels }}

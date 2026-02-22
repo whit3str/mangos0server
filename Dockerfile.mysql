@@ -1,12 +1,12 @@
 FROM mysql:8.0
 
-ENV MYSQL_ROOT_PASSWORD=mangos
-
-# Copy the database submodule into the container
+# Copy SQL scripts (database submodule)
 COPY database /database
 
-# Copy the initialization script
-COPY init-databases.sh /docker-entrypoint-initdb.d/
+# Copy init script and fix line endings (CRLF -> LF) at build time
+COPY init-databases.sh /docker-entrypoint-initdb.d/init-databases.sh
+RUN sed -i 's/\r//' /docker-entrypoint-initdb.d/init-databases.sh \
+    && find /database -name '*.sql' -exec sed -i 's/\r//' {} +
 
 # Ensure the script is executable
 RUN chmod +x /docker-entrypoint-initdb.d/init-databases.sh
